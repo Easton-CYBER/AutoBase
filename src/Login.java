@@ -4,11 +4,6 @@ import java.awt.event.*;
 public class Login extends JFrame implements ActionListener{
     private static final long serialVersionUID = 1L;
 
-    public static void main(String[] args) {
-        Login frameTable = new Login();
-        frameTable.Log();
-    }
-
     protected JButton blogin;
     protected JPanel panel;
     protected JTextField txuser;
@@ -49,8 +44,12 @@ public class Login extends JFrame implements ActionListener{
 
             public void actionPerformed(ActionEvent e){
                 String puname = txuser.getText();
-                String ppaswd = pass.getText();
-                if(puname.equals("admin") && ppaswd.equals("admin")){
+                char[] ppaswd = pass.getPassword();
+                String getpass = String.valueOf(ppaswd);
+                if(puname.equals("admin") && getpass.equals("admin")){
+                    dispose();
+                    Table tbl = new Table();
+                    tbl.FetchTable();
                     System.out.println("correct");
                 }else{
                     JOptionPane.showMessageDialog(null,"wrong Password / Username");
