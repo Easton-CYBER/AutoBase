@@ -3,7 +3,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
 
-public class Form extends JFrame implements ActionListener {
+public class Form extends JFrame {
     private static final long serialVersionUID = 1L;
 
     protected JPanel panel;
@@ -33,7 +33,10 @@ public class Form extends JFrame implements ActionListener {
         phone = new JTextField();
         home = new JTextField();
         submit = new JButton("Submit");
-        home.addActionListener(this);
+
+        Submit sbmt = new Submit();
+        home.addActionListener(sbmt);
+        submit.addActionListener(sbmt);
 
         lblfname = new JLabel("First Name:");
         lbllname = new JLabel("Last Name:");
@@ -82,36 +85,48 @@ public class Form extends JFrame implements ActionListener {
         setVisible(true);
     }
 
-    public void actionPerformed(ActionEvent e) {
-        String url;
-        String user;
-        String pass;
+    private class Submit implements ActionListener{
+        public void actionPerformed(ActionEvent e) {
+            String url;
+            String user;
+            String pass;
 
-        url = "jdbc:mysql://localhost:3306/customer_Info";
-        user = "root";
-        pass = "!1Swamigee";
+            url = "jdbc:mysql://localhost:3306/customer_Info";
+            user = "root";
+            pass = "!1Swamigee";
 
-        Connection con;
+            Connection con;
 
-        name = fname.getText();
-        lastname = lname.getText();
-        inemail = email.getText();
-        inphone = email.getText();
-        inhome = home.getText();
+            name = fname.getText();
+            lastname = lname.getText();
+            inemail = email.getText();
+            inphone = phone.getText();
+            inhome = home.getText();
 
-        try {
-            con = DriverManager.getConnection(url, user, pass);
-            PreparedStatement pstmt = con.prepareStatement("INSERT INTO `customer_info`.`info` (`First Name`, `Last Name`, `Email Address`, `Phone Number`, `Home Address`) VALUES (?, ?, ?, ?, ?)");
-            pstmt.setString(1, name);
-            pstmt.setString(2, lastname);
-            pstmt.setString(3, inemail);
-            pstmt.setString(4, inphone);
-            pstmt.setString(5, inhome);
-            pstmt.executeUpdate();
+            try {
+                con = DriverManager.getConnection(url, user, pass);
+                PreparedStatement pstmt = con.prepareStatement("INSERT INTO `customer_info`.`info` (`First Name`, `Last Name`, `Email Address`, `Phone Number`, `Home Address`) VALUES (?, ?, ?, ?, ?)");
+                pstmt.setString(1, name);
+                pstmt.setString(2, lastname);
+                pstmt.setString(3, inemail);
+                pstmt.setString(4, inphone);
+                pstmt.setString(5, inhome);
+                pstmt.executeUpdate();
 
-            con.close();
-        } catch (SQLException e1) {
-            e1.printStackTrace();
+                con.close();
+                setVisible(false);
+                dispose();
+
+                try{
+                    Table tbl = new Table();
+                    tbl.Wait();
+                    dispose();
+                }catch(Exception ele){
+                    ele.printStackTrace();
+                }
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+            }
         }
     }
     public static void main(String[] args) {
