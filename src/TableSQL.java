@@ -19,7 +19,8 @@ class Table {
 	JTable tbl;
 	JLabel label1;
 	String fname;
-	String lname;
+	public String lname;
+	public String clname;
 	String email;
 	String phone;
 	String home;
@@ -28,11 +29,13 @@ class Table {
 	int row;
 	JMenuBar menubar;
 	JMenu menu;
+	private JMenu tbls; 
 	JMenuItem md;
 	JMenuItem ms;
 	JMenuItem save;
 	JMenuItem re;
 	JMenuItem send;
+	private JMenuItem car;
 	String emailadd;
 
 	String upname;
@@ -61,7 +64,9 @@ class Table {
 
 			menubar = new JMenuBar();
 			menu = new JMenu("Edit");
+			tbls = new JMenu("Tables");
 			menubar.add(menu);
+			menubar.add(tbls);
 
 			md = new JMenuItem("Delete");
 			md.addActionListener(click);
@@ -83,6 +88,10 @@ class Table {
 			send.addActionListener(click);
 			menu.add(send);
 
+			car = new JMenuItem("Car Info");
+			car.addActionListener(click);
+			tbls.add(car);
+
 			Statement stmnt = con.createStatement();
 			ResultSet rs = stmnt.executeQuery("select * from info;");
 
@@ -90,6 +99,9 @@ class Table {
 			dtm = new DefaultTableModel(0, 0);
 			dtm.setColumnIdentifiers(index);
 			tbl.setModel(dtm);
+
+			TableColumnModel colmod = tbl.getColumnModel();
+			colmod.getColumn(0).setPreferredWidth(40);
 
 			while (rs.next()) {
 				id = rs.getInt(1);
@@ -122,6 +134,8 @@ class Table {
 			jf.setLayout(new FlowLayout());
 			jf.setSize(1035, 720);
 			jf.setVisible(true);
+
+			clname = lname;
 
 			con.close();
 		} catch (SQLException el) {
@@ -253,7 +267,17 @@ class Table {
             message.setFrom(new InternetAddress("nyazawa99@gmail.com"));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(emailadd));
             message.setSubject("Testing Gmail");
-            message.setText("physics is bad for ur health," + "\n\n Hello World");
+            message.setText("Thank You for Choosing us for your car repair needs. We hope you were satisfied by our service"
+			+ "\n\n                                                     Receipt"
+			+ "\n\n Repair 1:                                                                                    Cost:              "
+			+ "\n\n Repair 2:                                                                                    Cost:              "
+			+ "\n\n Repair 3:                                                                                    Cost:              "
+			+ "\n\n Repair 4:                                                                                    Cost:              "
+			+ "\n\n Repair 5:                                                                                    Cost:              "
+			+ "\n\n Repair 6:                                                                                    Cost:              "
+			+ "\n\n Repair 7:                                                                                    Cost:              "
+			+ "\n\n Repair 8:                                                                                    Cost:              "
+			+ "\n\n                                                                                               Total:              ");
 
             Transport.send(message);
 
@@ -280,6 +304,11 @@ class Table {
 			}
 			if(e.getSource() == send){
 				Receipt();
+			}
+			if(e.getSource() == car){
+				jf.dispose();
+				CarTable crtbl = new CarTable();
+				crtbl.FetchTable();
 			}
 		}
 	}
