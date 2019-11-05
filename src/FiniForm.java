@@ -1,4 +1,4 @@
-import java.sql.*;
+/*import java.sql.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -6,18 +6,17 @@ import java.awt.event.*;
 class FiniForm extends JFrame{
     private static final long serialVersionUID = 1L;
 
-    protected JPanel panel;
-    protected JButton submit;
+  /*  protected JPanel panel;
+    protected JButton fsubmit;
     protected JTextField odoread;
     protected JLabel lblodoread;
-
     public String odoreturn;
 
     public void Form() {
         Font font = new Font("serif", Font.PLAIN, 18);
 
         panel = new JPanel();
-        submit = new JButton("Submit");
+        fsubmit = new JButton("Submit");
 
         odoread = new JTextField();
 
@@ -31,12 +30,12 @@ class FiniForm extends JFrame{
         panel.setLayout(null);
 
         odoread.setBounds(50, 50, 400, 30);
-        submit.setBounds(150, 200, 200, 40);
+        fsubmit.setBounds(150, 200, 200, 40);
         odoread.setFont(font);
         lblodoread.setFont(font);
         lblodoread.setBounds(50, 15, 200, 40);
 
-        panel.add(submit);
+        panel.add(fsubmit);
         panel.add(odoread);
         panel.add(lblodoread);
 
@@ -45,7 +44,7 @@ class FiniForm extends JFrame{
         setVisible(true);
     }
 
-    private class Submit implements ActionListener{
+    public class Submit implements ActionListener{
         public void actionPerformed(ActionEvent e) {
             MysqlCon sql = new MysqlCon();
 
@@ -77,4 +76,4 @@ class FiniForm extends JFrame{
             }
         }
     }
-}
+}*/

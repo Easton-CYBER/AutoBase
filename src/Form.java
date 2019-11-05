@@ -170,7 +170,7 @@ public class Form extends JFrame {
         panel.add(lblhome);
 
         getContentPane().add(panel);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setVisible(true);
     }
 
@@ -216,6 +216,12 @@ public class Form extends JFrame {
                 prestat.setString(7, odoreads);
                 prestat.executeUpdate();
 
+                /*PreparedStatement prest = con.prepareStatement();
+                prest.setString(1, lastname);
+                prest.setString(2, vins);
+                prest.setString(3, licences);
+                prest.executeUpdate();*/
+
                 con.close();
                 setVisible(false);
                 dispose();
@@ -223,6 +229,7 @@ public class Form extends JFrame {
                 try{
                     Table tbl = new Table();
                     tbl.Wait();
+                    tbl.Refresh();
                     dispose();
                 }catch(Exception ele){
                     ele.printStackTrace();

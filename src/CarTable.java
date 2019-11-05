@@ -2,12 +2,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.table.*;
+
 import java.sql.*;
 import java.util.concurrent.*;
-import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import java.util.Properties;
 
 class CarTable {
     public static void main(String[] args){
@@ -16,13 +13,13 @@ class CarTable {
     }
 
 	MysqlCon sql = new MysqlCon();
-	Table tabl = new Table();
+	Table table = new Table();
 	DefaultTableModel dtm;
 
 	public Connection con;
 	String[] index;
 	JFrame jf;
-	JTable tbl;
+	private JTable tabl;
 	JLabel label1;
 	String lname;
 	int year;
@@ -42,16 +39,29 @@ class CarTable {
 	JMenuItem md;
 	JMenuItem ms;
 	JMenuItem save;
-    JMenuItem re;
+	JMenuItem re;
+	JMenuItem finish;
 	private JMenuItem customer;
 	String emailadd;
 	JMenuItem fini;
 
+	String lastName;
 	String upyear;
 	String upmake;
 	String upmodel;
 	String upvin;
 	String uplicence;
+	String upodore;
+	String upodoin;
+
+	protected JButton fsubmit;
+    protected JTextField odoread;
+    protected JLabel lblodoread;
+    public String odoreturn;
+
+	String last;
+	String vinstring;
+	String licencestring;
 
 	public void sqlCon() {
 		try {
@@ -101,15 +111,19 @@ class CarTable {
 			fini.addActionListener(click);
 			menu.add(fini);
 
+			finish = new JMenuItem("Finished");
+			finish.addActionListener(click);
+			tbls.add(finish);
+
 			Statement stmnt = con.createStatement();
 			ResultSet rs = stmnt.executeQuery("select * from `car-info`;");
 
-			tbl = new JTable();
+			tabl = new JTable();
 			dtm = new DefaultTableModel(0, 0);
 			dtm.setColumnIdentifiers(index);
-            tbl.setModel(dtm);
+            tabl.setModel(dtm);
             
-            TableColumnModel colmod = tbl.getColumnModel();
+            TableColumnModel colmod = tabl.getColumnModel();
             colmod.getColumn(0).setPreferredWidth(10);
 			colmod.getColumn(2).setPreferredWidth(40);
 			colmod.getColumn(6).setPreferredWidth(50);
@@ -129,18 +143,18 @@ class CarTable {
 				lname = rs.getString(2);
 				
 
-				dtm.insertRow(tbl.getRowCount(), new Object[] { id, lname, year, make, model, vin, licence,  odoint, odoout, date });
+				dtm.insertRow(tabl.getRowCount(), new Object[] { id, lname, year, make, model, vin, licence,  odoint, odoout, date });
 			}
 
-			tbl.setBounds(30, 40, 500, 400);
+			tabl.setBounds(30, 40, 500, 400);
 
-			JScrollPane scrollP = new JScrollPane(tbl);
+			JScrollPane scrollP = new JScrollPane(tabl);
 			scrollP.getVerticalScrollBar().setPreferredSize(new Dimension(20, 0));
 			scrollP.getHorizontalScrollBar().setPreferredSize(new Dimension(0, 20));
 
 			DefaultTableCellRenderer tableRenderer = new DefaultTableCellRenderer();
 			tableRenderer.setHorizontalAlignment(JLabel.LEFT);
-			tbl.setDefaultRenderer(Object.class, tableRenderer);
+			tabl.setDefaultRenderer(Object.class, tableRenderer);
 
 			scrollP.setBorder(BorderFactory.createEmptyBorder());
 			scrollP.setPreferredSize(new Dimension(1200, 720));
@@ -160,8 +174,8 @@ class CarTable {
 	}
 
 	public String IdVal(){
-		row = tbl.getSelectedRow();
-		IdVal = tbl.getModel().getValueAt(row, 0).toString(); 
+		row = tabl.getSelectedRow();
+		IdVal = tabl.getModel().getValueAt(row, 0).toString(); 
 
 		return IdVal;
     }
@@ -209,30 +223,32 @@ class CarTable {
 		form.Data();
 	}
 
-	public void Fini(){
-		FiniForm finform = new FiniForm();
-		finform.Form();
-	}
-
 	public void Save(){
 		try {
 			sqlCon();
 			IdVal();
+			row = tabl.getSelectedRow();
 
-			upyear = tbl.getModel().getValueAt(row, 1).toString();
-			upmake = tbl.getModel().getValueAt(row, 2).toString();
-            upmodel = tbl.getModel().getValueAt(row, 3).toString();
-			upvin = tbl.getModel().getValueAt(row, 4).toString();
-			uplicence = tbl.getModel().getValueAt(row, 5).toString();
+			lastName = tabl.getModel().getValueAt(row, 1).toString();
+			upyear = tabl.getModel().getValueAt(row, 2).toString();
+			upmake = tabl.getModel().getValueAt(row, 3).toString();
+            upmodel = tabl.getModel().getValueAt(row, 4).toString();
+			upvin = tabl.getModel().getValueAt(row, 5).toString();
+			uplicence = tabl.getModel().getValueAt(row, 6).toString();
+			upodore = tabl.getModel().getValueAt(row, 7).toString();
+			upodoin = tabl.getModel().getValueAt(row, 8).toString();
 
-			PreparedStatement pstmt = con.prepareStatement("UPDATE customer_info.`car-info` SET Year = ?, Make = ?, Model = ?, `VIN #` = ?, `Licence Plate` = ? WHERE `id-car-info` = ?;");
-			pstmt.setString(1, upyear);
-			pstmt.setString(2, upmake);
-            pstmt.setString(3, upmodel);
-			pstmt.setString(4, upvin);
-			pstmt.setString(5, uplicence);
-			pstmt.setString(6, IdVal);
-			pstmt.executeUpdate();
+			PreparedStatement prtmt = con.prepareStatement("UPDATE customer_info.`car-info` SET `Last Name` = ?, `Year` = ?, `Make` = ?, `Model` = ?, `VIN #` = ?, `Licence Plate` = ?, `odometer reading on intake` =  ?, `odometer reading on return` = ? WHERE `id-car-info` = ?;");
+			prtmt.setString(1, lastName);
+			prtmt.setString(2, upyear);
+			prtmt.setString(3, upmake);
+            prtmt.setString(4, upmodel);
+			prtmt.setString(5, upvin);
+			prtmt.setString(6, uplicence);
+			prtmt.setString(7, upodore);
+			prtmt.setString(8, upodoin);
+			prtmt.setString(9, IdVal);
+			prtmt.executeUpdate();
 
 			System.out.println("updated row " + IdVal);
 			con.close();
@@ -247,53 +263,94 @@ class CarTable {
 		}
 	}
 
-	public void SendMail(){
-        final String username = "nyazawa99@gmail.com";
-        final String password = "niconiconii";
+	public JPanel panel;
+	public JFrame frame;
+	public void Form() {
+		
+	
+        Font font = new Font("serif", Font.PLAIN, 18);
 
-        Properties prop = new Properties();
-		prop.put("mail.smtp.host", "smtp.gmail.com");
-        prop.put("mail.smtp.port", "587");
-        prop.put("mail.smtp.auth", "true");
-        prop.put("mail.smtp.starttls.enable", "true"); //TLS
-        
-        Session session = Session.getInstance(prop,
-                new javax.mail.Authenticator() {
-                    protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication(username, password);
-                    }
-                });
+		frame = new JFrame();
+        panel = new JPanel();
+        fsubmit = new JButton("Submit");
 
-        try {
+        odoread = new JTextField();
+
+        Submit sbmt = new Submit();
+		odoread.addActionListener(sbmt);
+		fsubmit.addActionListener(sbmt);
+
+        lblodoread = new JLabel("Odometer Reading:");
+
+        frame.setSize(500, 200);
+        frame.setLocation(500, 280);
+        panel.setLayout(null);
+
+        odoread.setBounds(50, 50, 400, 30);
+        fsubmit.setBounds(150, 100, 200, 40);
+        odoread.setFont(font);
+        lblodoread.setFont(font);
+        lblodoread.setBounds(50, 15, 200, 40);
+
+        panel.add(fsubmit);
+        panel.add(odoread);
+        panel.add(lblodoread);
+
+        frame.getContentPane().add(panel);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setVisible(true);
+	}
+	
+	public class Submit implements ActionListener{
+        public void actionPerformed(ActionEvent e) {
+            MysqlCon sql = new MysqlCon();
+
+            Connection con;
+
+            odoreturn = odoread.getText();
+
             try {
-                sqlCon();
 				IdVal();
+
+                String carsql = "UPDATE `customer_info`.`car-info` SET `odometer reading on return` = ? WHERE `id-car-info` = ?;";
+				String selsql = "SELECT * FROM `customer_info`.`car-info` WHERE `id-car-info` = " + IdVal + ";";
+				String finsql = "INSERT INTO `customer_info`.`finished-repairs` (`Last Name`, `VIN #`, `Licence Plate`) VALUES (?, ?, ?);";
+
+                con = DriverManager.getConnection(sql.url, sql.user, sql.password);
+                PreparedStatement pstmt = con.prepareStatement(carsql);
+				pstmt.setString(1, odoreturn);
+				pstmt.setString(2, IdVal);
+				pstmt.executeUpdate();
 				
-                Statement tmt = con.createStatement();
-                ResultSet rs = tmt.executeQuery("select * from info WHERE id = " + IdVal + ";");
-                while (rs.next()){
-					emailadd = rs.getString(4);
-					System.out.println(emailadd);
+				Statement st = con.createStatement();
+				ResultSet rs = st.executeQuery(selsql);
+
+				while(rs.next()){
+					last = rs.getString(2);
+					vinstring = rs.getString(6);
+					licencestring = rs.getString(7);
+				}
+
+				PreparedStatement prest = con.prepareStatement(finsql);
+                prest.setString(1, last);
+                prest.setString(2, vinstring);
+                prest.setString(3, licencestring);
+                prest.executeUpdate();
+
+                con.close();
+                try{
+					wait();
+					Refresh();
+                    frame.dispose();
+                }catch(Exception ele){
+                    ele.printStackTrace();
                 }
-                System.out.println("connected to database");
-
-            } catch (SQLException e){
-                System.out.println("could not pull from database");
-            };
-            Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress("nyazawa99@gmail.com"));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(emailadd));
-            message.setSubject("Testing Gmail");
-            message.setText("physics is bad for ur health," + "\n\n Hello World");
-
-            Transport.send(message);
-
-            System.out.println("Receipt Sent");
-
-        } catch (MessagingException e) {
-            System.out.println("could not send receipt");
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+            }
         }
-    }
+	}
+	
 
 	private class Clicklistener implements ActionListener {
 		public void actionPerformed(ActionEvent e){
@@ -315,7 +372,12 @@ class CarTable {
                 tabl.FetchTable();
 			}
 			if(e.getSource() == fini){
-				Fini();
+				Form();
+			}
+			if(e.getSource() == finish){
+				jf.dispose();
+				FinTable finir = new FinTable();
+				finir.FetchTable();
 			}
         }
 	}
