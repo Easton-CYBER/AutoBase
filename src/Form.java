@@ -3,17 +3,19 @@ import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
 
+//creates a form with multiple text inputs for the user to input contact info and car info.
+//info is sent to the mysql server and inputed into the correct columns and tables when the user hits submit.
+
 public class Form extends JFrame {
     private static final long serialVersionUID = 1L;
 
+    //Declaring  varialbes and objects
     protected JPanel panel;
-
     protected JTextField fname;
     protected JTextField lname;
     protected JTextField email;
     protected JTextField phone;
     protected JTextField home;
-
     protected JButton submit;
 
     protected JLabel lblfname;
@@ -49,7 +51,31 @@ public class Form extends JFrame {
     public String licences;
     public String odoreads;
 
-    public void Data() {
+    //creates the form, and defines variable for each text input
+    public void Data() 
+    {
+    	try 
+    	{
+            //here you can put the selected theme class name in JTattoo
+    		UIManager.setLookAndFeel("com.jtattoo.plaf.mint.MintLookAndFeel");
+
+        }
+    	catch (ClassNotFoundException ex) 
+    	{
+        	System.out.println("error");
+        }
+    	catch (InstantiationException ex)
+{
+        	System.out.println("error");
+        }
+    	catch (IllegalAccessException ex) 
+    	{
+        	System.out.println("error");
+        } 
+    	catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            System.out.println("error");
+        }
+    	
         Font font = new Font("serif", Font.PLAIN, 18);
 
         panel = new JPanel();
@@ -174,8 +200,12 @@ public class Form extends JFrame {
         setVisible(true);
     }
 
-    private class Submit implements ActionListener{
-        public void actionPerformed(ActionEvent e) {
+    //"listens" for an action such as the submit button being clicked or the user hitting enter
+    //send information to mysql when an action is performed.
+    private class Submit implements ActionListener
+    {
+        public void actionPerformed(ActionEvent e)
+        {
             MysqlCon sql = new MysqlCon();
 
             Connection con;
@@ -193,9 +223,10 @@ public class Form extends JFrame {
             licences = licence.getText();
             odoreads = odoread.getText();
 
-            try {
-                String customersql = "INSERT INTO `customer_info`.`info` (`First Name`, `Last Name`, `Email Address`, `Phone Number`, `Home Address`) VALUES (?, ?, ?, ?, ?)";
-                String carsql = "INSERT INTO `customer_info`.`car-info` (`Last Name`, `Year`, `Make`, `Model`, `VIN #`, `Licence Plate`, `odometer reading on intake`) VALUES (?, ?, ?, ?, ?, ?, ?);";
+            try 
+            {
+                String customersql = "INSERT INTO `info_db`.`info` (`First Name`, `Last Name`, `Email Address`, `Phone Number`, `Home Address`) VALUES (?, ?, ?, ?, ?)";
+                String carsql = "INSERT INTO `info_db`.`car-info` (`Last Name`, `Year`, `Make`, `Model`, `VIN #`, `Licence Plate`, `odometer reading on intake`) VALUES (?, ?, ?, ?, ?, ?, ?);";
 
                 con = DriverManager.getConnection(sql.url, sql.user, sql.password);
                 PreparedStatement pstmt = con.prepareStatement(customersql);
@@ -226,20 +257,28 @@ public class Form extends JFrame {
                 setVisible(false);
                 dispose();
 
-                try{
+                try
+                {
                     Table tbl = new Table();
                     tbl.Wait();
                     tbl.Refresh();
                     dispose();
-                }catch(Exception ele){
+                }
+                catch(Exception ele)
+                {
                     ele.printStackTrace();
                 }
-            } catch (SQLException e1) {
+            } 
+            catch (SQLException e1) 
+            {
                 e1.printStackTrace();
             }
         }
     }
-    public static void main(String[] args) {
+    
+    //main method
+    public static void main(String[] args) 
+    {
         Form frameTable = new Form();
         frameTable.Data();
     }

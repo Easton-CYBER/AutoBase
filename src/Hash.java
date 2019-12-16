@@ -1,5 +1,7 @@
 //import java.nio.charset.*;
 //import java.security.*;
+
+//hashing algo used when creating users and logging in.
 /*
 class Hash{
     private String passToHash;

@@ -9,17 +9,24 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.security.*;
 
-public class Login extends JFrame implements ActionListener {
+//creates the login frame for users to input their username and password to access the table/database information
+//can also go to the new user frame by clicking the "create new user" button
+
+public class Login extends JFrame implements ActionListener 
+{
     private static final long serialVersionUID = 1L;
 
+    //creates new instances of other classes
     MysqlCon sql = new MysqlCon();
     Connection usercon;
 
+    //declaring variables and objects
     protected JButton blogin;
     protected JButton newuser;
     protected JPanel panel;
@@ -35,7 +42,31 @@ public class Login extends JFrame implements ActionListener {
     private String getpass;
     private String sqlpass;
 
-    public void Log() {
+    public void Log() 
+    {
+    	//setting look and feel
+    	try 
+    	{
+            //here you can put the selected theme class name in JTattoo
+            UIManager.setLookAndFeel("com.jtattoo.plaf.mint.MintLookAndFeel");
+
+        } 
+    	catch (ClassNotFoundException ex) 
+    	{
+        	System.out.println("error");
+        } 
+    	catch (InstantiationException ex) 
+    	{
+        	System.out.println("error");
+        } 
+    	catch (IllegalAccessException ex) 
+    	{
+        	System.out.println("error");
+        } 
+    	catch (javax.swing.UnsupportedLookAndFeelException ex)
+    	{
+            System.out.println("error");
+        }
 
         l1 = new JLabel("Username");
         l2 = new JLabel("Password");
@@ -71,21 +102,31 @@ public class Login extends JFrame implements ActionListener {
         setVisible(true);
     }
 
-    public void connectsql() {
-        try {
+    //connects to the mysql database
+    public void connectsql()
+    {
+        try 
+        {
             usercon = DriverManager.getConnection(sql.url, sql.user, sql.password);
-        } catch (SQLException el) {
+        } 
+        catch (SQLException el)
+        {
             System.out.println("could not connect to database");
         }
     }
 
-    private void check_password(String plainPassword, String hashedPassword){
-        if(BCrypt.checkpw(plainPassword, hashedPassword)){
+    //checks if the password is the same as what is stored in the database
+    private void check_password(String plainPassword, String hashedPassword)
+    {
+        if(BCrypt.checkpw(plainPassword, hashedPassword))
+        {
             Table tbl = new Table();
             tbl.FetchTable();
             System.out.println("Match");
             dispose();
-        }else{
+        }
+        else
+        {
             JOptionPane.showMessageDialog(null,"wrong Password / Username");
             txuser.setText("");
             pass.setText("");
@@ -93,30 +134,40 @@ public class Login extends JFrame implements ActionListener {
         }
     }
 
+    //listens for actions performed
     public void actionPerformed(ActionEvent e){
-        if(e.getSource() == pass || e.getSource() == blogin){
-            try{
+    	//checks for username and password and open the table if they are the same as what is stored in the database
+        if(e.getSource() == pass || e.getSource() == blogin)
+        {
+            try
+            {
                 puname = txuser.getText();
                 ppaswd = pass.getPassword();
                 getpass = String.valueOf(ppaswd);
                 connectsql();
 
                 Statement userstat = usercon.createStatement();
-                ResultSet userres = userstat.executeQuery("SELECT * FROM customer_info.users WHERE username = '"+ puname +"';");
+                ResultSet userres = userstat.executeQuery("SELECT * FROM info_db.users WHERE username = '"+ puname +"';");
 
-                while(userres.next()){
+                while(userres.next())
+                {
                     sqlpass = userres.getString(3);
                 }
 
                 check_password(getpass, sqlpass);
-            }catch(SQLException el){
+            }
+            catch(SQLException el)
+            {
                 JOptionPane.showMessageDialog(null,"could not access user database");
                 txuser.setText("");
                 pass.setText("");
                 txuser.requestFocus();
             }
         }
-        if(e.getSource() == newuser){
+        
+        //creates instance of NewUser class and runs it
+        if(e.getSource() == newuser)
+        {
             NewUser newuser = new NewUser();
             newuser.create_new_user();
         }

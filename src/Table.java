@@ -1,5 +1,5 @@
+import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,6 +30,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
@@ -43,39 +44,41 @@ class Table {
 	public Connection con;
 	public JTable tbl;
 
-	String[] index;
-	JFrame jf;
-	JFrame reptfr;
+	private String[] index;
+	private JFrame jf;
+	private JFrame reptfr;
 
-	JLabel label1;
-	String fname;
-	String email;
-	String phone;
-	String home;
+	private JLabel label1;
+	private String fname;
+	private String email;
+	private String phone;
+	private String home;
 	
 	public String lname;
 	public String clname;
 	public String IdVal;
 	public String getEmail;
 
-	JMenuBar menubar;
-	JMenu menu;
-	JMenuItem md;
-	JMenuItem ms;
-	JMenuItem save;
-	JMenuItem re;
-	JMenuItem send;
-	String emailadd;
-	JMenuItem finish;
+	private JMenuBar menubar;
+	private JMenu menu;
+	private JMenuItem md;
+	private JMenuItem ms;
+	private JMenuItem save;
+	private JMenuItem re;
+	private JMenuItem send;
+	private String emailadd;
+	private JMenuItem finish;
 
 	private JMenuItem car;
 	private JMenu tbls; 
 
-	String upname;
-	String uplname;
-	String upemail;
-	String upphone;
-	String uphome;
+	private String upname;
+	private String uplname;
+	private String upemail;
+	private String upphone;
+	private String uphome;
+	private String lnamedel;
+	private String search_string;
 
 	int id;
 	int row;
@@ -91,6 +94,7 @@ class Table {
 	int numunit;
 
 	protected JPanel panel;
+	protected JPanel search_pan;
     protected JButton fsubmit;
     protected JTextField part;
     protected JTextField txtlb;
@@ -102,21 +106,51 @@ class Table {
     protected JLabel lblshp;
     protected JLabel lbldisp;
     protected JLabel lblunit;
+    
+    protected JTextField search;
 
-	public Table() {
-		
+	public Table() 
+	{
+		try 
+		{
+            //here you can put the selected theme class name in JTattoo
+            UIManager.setLookAndFeel("com.jtattoo.plaf.mint.MintLookAndFeel");
+
+        } 
+		catch (ClassNotFoundException ex)
+		{
+        	System.out.println("error");
+        }
+		catch (InstantiationException ex)
+		{
+        	System.out.println("error");
+        }
+		catch (IllegalAccessException ex)
+		{
+        	System.out.println("error");
+        } 
+		catch (javax.swing.UnsupportedLookAndFeelException ex)
+		{
+            System.out.println("error");
+        }
 	}
 
-	public void sqlCon() {
-		try {
+	public void sqlCon() 
+	{
+		try
+		{
 			con = DriverManager.getConnection(sql.url, sql.user, sql.password);
-		} catch (SQLException el) {
+		}
+		catch (SQLException el)
+		{
 			System.out.println("Could not connect to database");
 		}
 	}
 
-	public void FetchTable() {
-		try {
+	public void FetchTable() 
+	{
+		try 
+		{
 			sqlCon();
 
 			index = new String[] { "ID", "First Name", "Last Name", "Email Address", "Phone Number", "Home Address" };
@@ -170,7 +204,8 @@ class Table {
 			TableColumnModel colmod = tbl.getColumnModel();
 			colmod.getColumn(0).setPreferredWidth(40);
 
-			while (rs.next()) {
+			while (rs.next()) 
+			{
 				id = rs.getInt(1);
 				fname = rs.getString(2);
 				lname = rs.getString(3);
@@ -182,7 +217,9 @@ class Table {
 			}
 
 			tbl.setBounds(30, 40, 300, 400);
-
+			tbl.getTableHeader().setReorderingAllowed(false);
+			tbl.getTableHeader().setResizingAllowed(false);
+			
 			JScrollPane scrollP = new JScrollPane(tbl);
 			scrollP.getVerticalScrollBar().setPreferredSize(new Dimension(20, 0));
 			scrollP.getHorizontalScrollBar().setPreferredSize(new Dimension(0, 20));
@@ -193,12 +230,23 @@ class Table {
 
 			scrollP.setBorder(BorderFactory.createEmptyBorder());
 			scrollP.setPreferredSize(new Dimension(1020, 600));
+			
+			label1.setFont(new Font("serif", Font.PLAIN, 20));
 
-			jf.add(label1);
+			search_pan = new JPanel();
+			search = new JTextField(15);
+			search.setText("search");
+			search.setBounds(400, 100, 20, 50);
+			search.addActionListener(click);
+			
+			search_pan.add(search);
+
+			jf.add(label1, BorderLayout.NORTH);
 			jf.add(scrollP);
+			jf.add(search_pan, BorderLayout.EAST);
 			jf.setJMenuBar(menubar);
 			jf.setResizable(true);
-			jf.setLayout(new FlowLayout());
+			//jf.setLayout(new FlowLayout());
 			jf.setSize(1035, 720);
 			jf.setVisible(true);
 			jf.setResizable(false);
@@ -206,63 +254,115 @@ class Table {
 			clname = lname;
 
 			con.close();
-		} catch (SQLException el) {
+		} 
+		catch (SQLException el) 
+		{
 			System.out.println("could not print table");
 		}
 	}
+	
+	private void search_table()
+	{
+		search_string = search.getText();
+		String sqlq = "SELECT * FROM info_db.info WHERE `First Name` LIKE  '%?%';";
+		
+		PreparedStatement prestat;
+		try {
+			prestat = con.prepareStatement(sqlq);
+			prestat.setString(1, search_string);
+			
+			ResultSet rs = prestat.executeQuery();
+			
+			while(rs.next())
+			{
+				//output array = rs.getstring(*some number*);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 
-	private String IdVal(){
+	private String IdVal()
+	{
 		row = tbl.getSelectedRow();
 		IdVal = tbl.getModel().getValueAt(row, 0).toString(); 
 
 		return IdVal;
 	}
 
-	public void Wait() {
-		try {
+	public void Wait()
+	{
+		try 
+		{
 			TimeUnit.MILLISECONDS.sleep(200);
 			Refresh();
-		} catch (InterruptedException e) {
+		} 
+		catch (InterruptedException e) 
+		{
 			e.printStackTrace();
 			System.out.println("could not refresh table");
 		}
 	}
 
-	public void Del() {
-		try {
+	public void Del()
+	{
+		try 
+		{
 			sqlCon();
 			IdVal();
 
-			PreparedStatement pstm = con.prepareStatement("DELETE FROM customer_info.info WHERE id = ?;");
+			PreparedStatement pstm = con.prepareStatement("DELETE FROM info_db.info WHERE id = ?;");
 			pstm.setString(1, IdVal);
 			pstm.executeUpdate();
+			
+			Statement st = con.createStatement();
+			ResultSet rs = st.executeQuery("Select * FROM info_db.info WHERE `id` = " + IdVal + ";");
+			
+			while(rs.next())
+			{
+				lnamedel = rs.getString(3);
+			}
+			
+			PreparedStatement ptm = con.prepareStatement("DELETE FROM info_db.`car-info` WHERE `Last Name` = ?;");
+			ptm.setString(1, lnamedel);
+			ptm.executeUpdate();
+			
 			System.out.println("Deleted row " + IdVal);
 			con.close();
 
-			try {
+			try
+			{
 				Wait();
-			} catch (Exception e) {
+			} 
+			catch (Exception e) 
+			{
 				e.printStackTrace();
 			}
-		}catch(SQLException el){
+		}
+		catch(SQLException el)
+		{
 			System.out.println("an error occured: could not delete row " + IdVal);
 		}
 	}
 
-	public void Refresh(){
+	public void Refresh()
+	{
 		jf.setVisible(false);
 		jf.dispose();
 
 		FetchTable();
 	}
 
-	public void Add(){
+	public void Add()
+	{
 		Form form = new Form();
 		form.Data();
 	}
 
-	public void Save(){
-		try {
+	public void Save()
+	{
+		try 
+		{
 			sqlCon();
 			IdVal();
 
@@ -272,7 +372,7 @@ class Table {
 			upphone = tbl.getModel().getValueAt(row, 4).toString();
 			uphome = tbl.getModel().getValueAt(row, 5).toString();
 
-			PreparedStatement pstmt = con.prepareStatement("UPDATE customer_info.info SET `First Name` = ?, `Last Name` = ?, `Email Address` = ?, `Phone Number` = ?, `Home Address` = ? WHERE id = ?;");
+			PreparedStatement pstmt = con.prepareStatement("UPDATE info_db.info SET `First Name` = ?, `Last Name` = ?, `Email Address` = ?, `Phone Number` = ?, `Home Address` = ? WHERE id = ?;");
 			pstmt.setString(1, upname);
 			pstmt.setString(2, uplname);
 			pstmt.setString(3, upemail);
@@ -284,17 +384,23 @@ class Table {
 			System.out.println("updated row " + IdVal);
 			con.close();
 
-			try{
+			try
+			{
 				Wait();
-			}catch(Exception e){
+			}
+			catch(Exception e)
+			{
 				e.printStackTrace();
 			}
-		}catch(SQLException el){
+		}
+		catch(SQLException el)
+		{
 			System.out.println("could not save changes to row " + IdVal);
 		}
 	}
 
-	public void Rept() {
+	public void Rept()
+	{
 		reptfr = new JFrame();
         Font font = new Font("serif", Font.PLAIN, 18);
 
@@ -366,25 +472,31 @@ class Table {
         reptfr.setVisible(true);
 	}
 	
-	public String getEmail(){
-		try {
+	public String getEmail()
+	{
+		try
+		{
             sqlCon();
 			IdVal();
 
             Statement tmt = con.createStatement();
             ResultSet rs = tmt.executeQuery("select * from info WHERE id = " + IdVal + ";");
-            while (rs.next()){
+            while (rs.next())
+            {
 				emailadd = rs.getString(4);
 			}
 			System.out.println("connected to database");
-        } catch (SQLException e){
+        } 
+		catch (SQLException e)
+		{
         	System.out.println("could not pull from database");
 		};
 		getEmail = emailadd;
 		return getEmail;
 	}
 
-	public void SendMail(){
+	public void SendMail()
+	{
         final String username = "nyazawa99@gmail.com";
         final String password = "niconiconii";
 
@@ -394,7 +506,8 @@ class Table {
         prop.put("mail.smtp.auth", "true");
         prop.put("mail.smtp.starttls.enable", "true");
         
-		try {
+		try 
+		{
             String p = part.getText();
             String l = txtlb.getText();
             String s = txtshp.getText();
@@ -406,7 +519,9 @@ class Table {
             shopint = Integer.parseInt(s);
             disposalint = Integer.parseInt(d);
             numunit = Integer.parseInt(n);
-        }catch(NumberFormatException e){
+        }
+		catch(NumberFormatException e)
+		{
             partsint = 0;
             labourint = 0;
             shopint = 0;
@@ -425,13 +540,16 @@ class Table {
 		int total = intparts + intlabour + intshop + intgarbo;
         
         Session session = Session.getInstance(prop,
-                new javax.mail.Authenticator() {
-                    protected PasswordAuthentication getPasswordAuthentication() {
+                new javax.mail.Authenticator()
+        		{
+                    protected PasswordAuthentication getPasswordAuthentication() 
+                    {
                         return new PasswordAuthentication(username, password);
                     }
                 });
 
-        try {
+        try 
+        {
 			getEmail();
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress("nyazawa99@gmail.com"));
@@ -458,43 +576,56 @@ class Table {
 
             System.out.println("Receipt Sent");
 
-        } catch (MessagingException e) {
+        } 
+        catch (MessagingException e) 
+        {
             System.out.println("could not send receipt");
         }
 	}
 
-	public class Clicklistener implements ActionListener {
-		public void actionPerformed(ActionEvent e){
-			if(e.getSource() ==  md){
+	public class Clicklistener implements ActionListener 
+	{
+		public void actionPerformed(ActionEvent e)
+		{
+			if(e.getSource() ==  md)
+			{
 				Del();
 			}
-			if(e.getSource() == ms){
+			if(e.getSource() == ms)
+			{
 				Add();
 			}
-			if(e.getSource() == save){
+			if(e.getSource() == save)
+			{
 				Save();
 			}
-			if(e.getSource() == re){
+			if(e.getSource() == re)
+			{
 				Refresh();
 			}
-			if(e.getSource() == send){
+			if(e.getSource() == send)
+			{
 				Rept();
 			}
-			if(e.getSource() == unit){
+			if(e.getSource() == unit)
+			{
 				SendMail();
 				reptfr.dispose();
 			}
-			if(e.getSource() == fsubmit){
+			if(e.getSource() == fsubmit)
+			{
 				SendMail();
 				reptfr.dispose();
 				
 			}
-			if(e.getSource() == car){
+			if(e.getSource() == car)
+			{
 				jf.dispose();
 				CarTable crtbl = new CarTable();
 				crtbl.FetchTable();
 			}
-			if(e.getSource() == finish){
+			if(e.getSource() == finish)
+			{
 				jf.dispose();
 				FinTable finir = new FinTable();
 				finir.FetchTable();

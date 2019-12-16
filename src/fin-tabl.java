@@ -6,34 +6,60 @@ import java.sql.*;
 import java.util.concurrent.*;
 
 class FinTable {
-    public static void main(String[] args){
+    public static void main(String[] args)
+    {
         FinTable fin = new FinTable();
         fin.FetchTable();
+        
+        try
+        {
+            //here you can put the selected theme class name in JTattoo
+        	UIManager.setLookAndFeel("com.jtattoo.plaf.mint.MintLookAndFeel");
+        }
+        catch (ClassNotFoundException ex)
+        {
+        	System.out.println("error");
+        } 
+        catch (InstantiationException ex) 
+        {
+        	System.out.println("error");
+        } 
+        catch (IllegalAccessException ex) 
+        {
+        	System.out.println("error");
+        }
+        catch (javax.swing.UnsupportedLookAndFeelException ex)
+        {
+            System.out.println("error");
+        }
     }
 
+    //create instances of other classes
 	MysqlCon sql = new MysqlCon();
 	Table tabl = new Table();
 	DefaultTableModel dtm;
 
+	//declares variables and objects
 	public Connection con;
-	String[] index;
-	JFrame jf;
+	public String[] index;
+	private JFrame jf;
 	private JTable tbl;
-	JLabel label1;
-	String lnamef;
-	String vinn;
-    String licencef;
-    String date;
+	private JLabel label1;
+	private String lnamef;
+	private String vinn;
+	private String licencef;
+	private String date;
+	private String idf;
 	public String IdVal;
-	String idf;
-	int row;
-	JMenuBar menubar;
-    JMenu menu;
+	
+	private JMenuBar menubar;
+	private JMenu menu;
     private JMenu tbls;
-	JMenuItem md;
-	JMenuItem ms;
-	JMenuItem car;
-	JMenuItem re;
+    private JMenuItem md;
+    private JMenuItem ms;
+    private JMenuItem car;
+    private JMenuItem re;
+	int row;
 	
 	private JMenuItem customer;
 	String emailadd;
@@ -45,16 +71,24 @@ class FinTable {
     protected JLabel lblodoread;
     public String odoreturn;
 
-	public void sqlCon() {
-		try {
+    //connects to mysql server
+	public void sqlCon() 
+	{
+		try 
+		{
 			con = DriverManager.getConnection(sql.url, sql.user, sql.password);
-		} catch (SQLException el) {
+		} 
+		catch (SQLException el) 
+		{
 			System.out.println("Could not connect to database");
 		}
 	}
 
-	public void FetchTable() {
-		try {
+	//creates and draws table
+	public void FetchTable()
+	{
+		try 
+		{
 			sqlCon();
 
 			index = new String[] {"id", "Last Name", "VIN #", "Licence", "Date Finished" };
@@ -97,7 +131,8 @@ class FinTable {
 			dtm.setColumnIdentifiers(index);
             tbl.setModel(dtm);
 
-			while (rs.next()) {
+			while (rs.next()) 
+			{
 				idf = rs.getString(1);				
 				vinn = rs.getString(3);
                 licencef = rs.getString(4);
@@ -129,79 +164,111 @@ class FinTable {
 			jf.setVisible(true);
 
 			con.close();
-		} catch (SQLException el) {
+		}
+		catch (SQLException el)
+		{
 			System.out.println("could not print table");
 		}
 	}
 
-	public String IdVal(){
+	//finds the value of the id of a selected row
+	public String IdVal()
+	{
 		row = tbl.getSelectedRow();
 		IdVal = tbl.getModel().getValueAt(row, 0).toString(); 
 
 		return IdVal;
     }
     
-	public void Wait() {
-		try {
+	//waits 2 seconds then runs the refresh() method
+	public void Wait()
+	{
+		try 
+		{
 			TimeUnit.MILLISECONDS.sleep(200);
 			Refresh();
-		} catch (InterruptedException e) {
+		}
+		catch (InterruptedException e)
+		{
 			e.printStackTrace();
 			System.out.println("could not refresh table");
 		}
 	}
 
-	public void Del() {
-		try {
+	//deletes the selected row
+	public void Del() 
+	{
+		try 
+		{
 			sqlCon();
 			IdVal();
 
-			PreparedStatement pstm = con.prepareStatement("DELETE FROM customer_info.`finished-repairs` WHERE `fin-id` = ?;");
+			PreparedStatement pstm = con.prepareStatement("DELETE FROM info_db.`finished-repairs` WHERE `fin-id` = ?;");
 			pstm.setString(1, IdVal);
 			pstm.executeUpdate();
 			System.out.println("Deleted row " + IdVal);
 			con.close();
 
-			try {
+			try 
+			{
 				Wait();
-			} catch (Exception e) {
+			} 
+			catch (Exception e)
+			{
 				e.printStackTrace();
 			}
-		}catch(SQLException el){
+		}
+		catch(SQLException el)
+		{
 			System.out.println("an error occured: could not delete row " + IdVal);
 		}
 	}
 
-	public void Refresh(){
+	//refreshes table
+	public void Refresh()
+	{
 		jf.setVisible(false);
 		jf.dispose();
 
 		FetchTable();
 	}
 
-	public void Add(){
+	//opens the form to add new data to the table/mysql server
+	public void Add()
+	{
 		Form form = new Form();
 		form.Data();
 	}
 	
-
-	private class Clicklistener implements ActionListener {
-		public void actionPerformed(ActionEvent e){
-			if(e.getSource() ==  md){
+	//listens for an actions to be performed, them runs the method that corresponds to that button/action
+	private class Clicklistener implements ActionListener
+	{
+		public void actionPerformed(ActionEvent e)
+		{
+			if(e.getSource() ==  md)
+			{
 				Del();
 			}
-			if(e.getSource() == ms){
+			
+			if(e.getSource() == ms)
+			{
 				Add();
 			}
-			if(e.getSource() == re){
+			
+			if(e.getSource() == re)
+			{
 				Refresh();
             }
-            if(e.getSource() == customer){
+			
+            if(e.getSource() == customer)
+            {
                 jf.dispose();
                 Table tabl = new Table();
 				tabl.FetchTable();
 			}
-			if(e.getSource() == car){
+            
+			if(e.getSource() == car)
+			{
 				jf.dispose();
 				CarTable ctable = new CarTable();
 				ctable.FetchTable();
