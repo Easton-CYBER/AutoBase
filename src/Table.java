@@ -550,27 +550,49 @@ class Table {
 
         try 
         {
+        	StringBuilder msg = new StringBuilder();
+        	msg.append("<html>\r\n" + 
+        			"    <body>\r\n" + 
+        			"        <table style = \"border-collapse: collapse; border: 1px solid black;\">\r\n" + 
+        			"            <tr style = \"border: 1px solid black;\">\r\n" + 
+        			"                <td style = \"border: 1px solid black;\"><b>Total Estimated Cost</b></td>\r\n" + 
+        			"                <td style = \"border: 1px solid black;\"><b>Price Per Unit</b></td>\r\n" + 
+        			"                <td style = \"border: 1px solid black;\"><b>Line Total</b></td>\r\n" + 
+        			"            </tr>\r\n" + 
+        			"            <tr style = \"border: 1px solid black;\">\r\n" + 
+        			"                <td style = \"border: 1px solid black;\">Parts:</td>\r\n" + 
+        			"                <td style = \"border: 1px solid black;\">" + inparts + "</td>\r\n" + 
+        			"                <td style = \"border: 1px solid black;\">" + intparts + "</td>\r\n" + 
+        			"            </tr>\r\n" + 
+        			"            <tr style = \"border: 1px solid black;\">\r\n" + 
+        			"                <td style = \"border: 1px solid black;\">Labour:</td>\r\n" + 
+        			"                <td style = \"border: 1px solid black;\">" + inlabour + "</td>\r\n" + 
+        			"                <td style = \"border: 1px solid black;\">" + intlabour + "</td>\r\n" + 
+        			"            </tr>\r\n" + 
+        			"            <tr style = \"border: 1px solid black;\">\r\n" + 
+        			"                <td style = \"border: 1px solid black;\">Shop Supplies:</td>\r\n" + 
+        			"                <td style = \"border: 1px solid black;\">" + inshop + "</td>\r\n" + 
+        			"                <td style = \"border: 1px solid black;\">" + intshop + "</td>\r\n" + 
+        			"            </tr>\r\n" + 
+        			"            <tr style = \"border: 1px solid black;\">\r\n" + 
+        			"                <td style = \"border: 1px solid black;\">Recycling/Disposal Fee:</td>\r\n" + 
+        			"                <td style = \"border: 1px solid black;\">" + ingarbo + "</td>\r\n" + 
+        			"                <td style = \"border: 1px solid black;\">" + intgarbo + "</td>\r\n" + 
+        			"            </tr>\r\n" + 
+        			"            <tr style = \"border: 1px solid black;\">\r\n" + 
+        			"                <td style = \"border: 1px solid black;\">Total Estimated Cost:</td>\r\n" + 
+        			"                <td style = \"border: 1px solid black;\"> </td>\r\n" + 
+        			"                <td style = \"border: 1px solid black;\">" + total + "</td>\r\n" + 
+        			"            </tr>\r\n" + 
+        			"        </table>\r\n" + 
+        			"    </body>\r\n" + 
+        			"</html>");
 			getEmail();
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress("nyazawa99@gmail.com"));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(emailadd));
             message.setSubject("Car Repair Receipt");
-			message.setText(
-				"Thank you for choosing our service \n\n" +
-				"Total Estimated Cost\n\n" +
-
-				"Price Per Unit:\n" +
-				"Parts: $" + inparts + "\n" +
-				"Labour: $" + inlabour + "\n" +
-				"Shop Supplies: $" + inshop + "\n" +
-				"Disposal fee: $" + ingarbo +
-				"\n\n" +
-				"Line Total:\n" +
-				"Parts: $" + intparts + "\n" +
-				"Labour: $" + intlabour + "\n" +
-				"Shop Supplies: $" + intshop + "\n" +
-				"Disposal fee: $" + intgarbo + "\n\n" +
-				"Total Estimated Cost: $" + total + "\n");
+            message.setContent(msg.toString(), "text/html");
 			
             Transport.send(message);
 
